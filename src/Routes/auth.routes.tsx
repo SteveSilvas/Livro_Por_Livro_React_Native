@@ -5,22 +5,21 @@ import { Text } from 'react-native';
 import React from 'react';
 
 
-export function StackRoutes() {
+export function AuthRoutes(props: any) {
     const Stack = createNativeStackNavigator();
-    // const renderLogin = ()=>{
-    //     return <Login/>
-    // }
 
-    // const renderRegister = ()=>{
-    //     return <Register/>
-    // }
+    const testeLogin = (isLogged:boolean) =>{
+        props.setIsLoggedIn(isLogged)
+    }
     return (
 
         <Stack.Navigator initialRouteName='Login'>
             <Stack.Screen
                 name="Login"
                 component={Login}
+                initialParams={{ isLoggedIn: testeLogin }}
             />
+
 
             <Stack.Screen
                 name="Register"

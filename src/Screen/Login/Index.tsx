@@ -3,36 +3,96 @@ import { StyleSheet, View, Text, Image, TextInput, ScrollView, SafeAreaView } fr
 import Button from "../../UI/Button";
 import { Input } from "../../UI/Input/Index";
 import { LoginType } from "../../@Types/LoginType";
+import LoginServices from '../../services/Auth/LoginServices'
+import { MessageModal } from "../../UI/MessageModal/MessageModal";
+import { MessageModalPropsType } from "../../@Types/MessageModalPropsType";
 
-const Login = ({ navigation }: any) => {
+const Login = ({ navigation, route }: any) => {
+    const { isLoggedIn } = route.params;
+    const [modal, setModal] = useState<MessageModalPropsType>(
+        {
+            message: "",
+            showModal: false,
+            closeModal: hideModal
+        }
+    );
+
     const [login, setLogin] = useState<LoginType>({
-        email: "",
-        pass: "",
-        loggedIn: false
+        Email: "",
+        Pass: "",
+        LoggedIn: false
     });
+
+    const showModal = (message: string, closeModalModify?: () => void): void => {
+        setModal({
+            message: message,
+            showModal: true,
+            closeModal: closeModalModify || hideModal
+        });
+    }
+
+    function closeModalModify(): void {
+        setModal((prev) => { return { ...prev, showModal: false } })
+        onClickRegister()
+    }
+
+    function hideModal(): void {
+        setModal((prev) => { return { ...prev, showModal: false } })
+    }
 
     const changeEmailHandler = (email: string) => {
         setLogin((prev) => {
-            return { ...prev, email: email }
+            return { ...prev, Email: email }
         });
     }
 
     const changePassHandler = (pass: string) => {
         setLogin((prev) => {
-            return { ...prev, pass: pass }
+            return { ...prev, Pass: pass }
         });
     }
 
-    const onClickLogin = () => {
-        alert("login");
+    const checkFields = () => {
+        if (!login.Email || !login.Pass) {
+            return false;
+        } else return true;
     }
 
-    const onClickRegister = () => {
-        navigation.navigate('Register');      
+    const onClickLogin = () => {
+        if (checkFields()) {
+
+            LoginServices.LoginAxiosRequest(login)
+                .then((response) => {
+                    // alert(response.message)
+
+                    showModal(response.message, closeModalModify);
+                })
+                .catch((error) => {
+                    if (error.response) {
+                        const errorMessage: string = `Erro: ${error.response.data}`;
+                        showModal(errorMessage);
+                    }
+                });
+        }
     }
- 
+
+
+
+    const onClickRegister = () => {
+        navigation.navigate('Register');
+    }
+
+    const renderMessageModal = () => {
+        return <MessageModal
+            showModal={modal.showModal}
+            message={modal.message}
+            closeModal={modal.closeModal}
+        />
+    }
+
     return (
         <SafeAreaView style={styles.loginPage}>
+            {renderMessageModal()}
             <ScrollView>
                 <View style={styles.panelApresentation}>
                     <Image

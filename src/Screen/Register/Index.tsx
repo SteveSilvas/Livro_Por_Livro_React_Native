@@ -92,13 +92,22 @@ export default function Register({ navigation }: any) {
     }
 
     const onClickSave = () => {
-        alert("save")
-        StatusRequets.StatusRequest();
-        // if (checkFields()) {
-        //     const registration = Registration.RegisterAxiosRequest(user);
-        //     // if (registration != undefined) navigation.navigate('Login');
-        // }
+        if (checkFields()) {
+            Registration.RegisterAxiosRequest(user)
+            .then((response)=>{
+                setError(response);
+                setShowMessageModal(true)
+                setTimeout(()=>{
+                    navigation.navigate('Login');
+                }, 3000)
+            })
+            .catch((error)=>{
+                setError(error.response.data);
+                setShowMessageModal(true)
+            });
+        }
     }
+
     const closeMessageModalHandler = () => {
         setShowMessageModal(false);
     }

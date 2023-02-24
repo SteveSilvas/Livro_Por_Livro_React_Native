@@ -1,14 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import { StyleSheet, Modal, View, Text } from 'react-native';
 import Button from '../Button';
+import { MessageModalPropsType } from '../../@Types/MessageModalPropsType';
 
-type modalPropsType = {
-    message: string,
-    showModal: boolean,
-    closeModal: () => void
-}
 
-export function MessageModal(modalProps: modalPropsType) {
+export function MessageModal(modalProps: MessageModalPropsType) {
     const [showModalLocal, setShowModalLocal] = useState<boolean>(modalProps.showModal);
 
     useEffect(() => {

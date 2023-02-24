@@ -1,9 +1,8 @@
 import axios from 'axios';
-import Config from 'react-native-config';
-const StatusRequest = () => {
-    console.log(process.env)
-    const statusURL = "http://10.9.0.115:4200/status";
 
+const statusURL = "http://10.9.0.115:4200/status";
+
+const StatusRequest = () => {
     fetch(`${statusURL}`)
         .then((response) => {
             if (!response.ok) {
@@ -22,9 +21,7 @@ const StatusRequest = () => {
 };
 
 const StatusAxiosRequest = () =>{
-  const localURL = "http://192.168.1.103:4200/status";
-
-  return axios.get(`${localURL}`)
+  return axios.get(`${statusURL}`)
     .then((response) => {
       console.log(response);
       if (response.status >= 400) {

@@ -1,6 +1,8 @@
 import axios from "axios";
 import { LoginType } from "../../@Types/LoginType";
 
+const usersURL = "http://10.9.0.115:4200/users";
+
 const LoginRequest = (data: LoginType) => {
     const usersURL = "http://192.168.1.103:4200/users";
     return fetch(`${usersURL}/login`, {
@@ -23,18 +25,15 @@ const LoginRequest = (data: LoginType) => {
 };
 
 const LoginAxiosRequest = (data: LoginType) => {
-    const usersURL = "http://192.168.1.103:4200/users";
 
     return axios
         .post(`${usersURL}/login`, data)
         .then((response) => {
             return response.data;
         })
-        .then((response) => {
-            alert(response);
-        })
         .catch((error) => {
-            console.error(error);
+            console.log(error)
+            throw error;
         });
 };
 

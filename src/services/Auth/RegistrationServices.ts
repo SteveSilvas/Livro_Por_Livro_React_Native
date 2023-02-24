@@ -1,8 +1,9 @@
 import axios from "axios";
 import { UserRegisterType } from "../../@Types/UserRegisterType";
 
+const usersURL = "http://10.9.0.115:4200/users";
+
 const RegisterRequest = (data: UserRegisterType) => {
-    const usersURL = "http://192.168.1.103:4200/users";
     return fetch(`${usersURL}/add`, {
         method: "POST",
         headers: {
@@ -11,6 +12,7 @@ const RegisterRequest = (data: UserRegisterType) => {
         body: JSON.stringify(data),
     })
         .then((response) => {
+            console.log(response)
             return response.text();
         })
         .then((data) => {
@@ -18,23 +20,19 @@ const RegisterRequest = (data: UserRegisterType) => {
             return data;
         })
         .catch((error) => {
-            console.error(error);
+            console.error("erro "+error);
         });
 };
 
 const RegisterAxiosRequest = (data: UserRegisterType) => {
-    const usersURL = "http://192.168.1.103:4200/users";
 
     return axios
         .post(`${usersURL}/add`, data)
         .then((response) => {
             return response.data;
         })
-        .then((response) => {
-            alert(response);
-        })
         .catch((error) => {
-            console.error(error);
+            throw error;
         });
 };
 

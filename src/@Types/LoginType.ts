@@ -1,5 +1,5 @@
 export type LoginType = {
-    email: string,
-    pass: string
-    loggedIn: boolean,
+    Email: string,
+    Pass: string
+    LoggedIn: boolean,
 }
