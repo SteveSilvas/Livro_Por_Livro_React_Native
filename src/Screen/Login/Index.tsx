@@ -1,14 +1,15 @@
-import React, { useState } from "react";
+import React, { useState, useContext } from "react";
 import { StyleSheet, View, Text, Image, TextInput, ScrollView, SafeAreaView } from "react-native";
 import Button from "../../UI/Button";
 import { Input } from "../../UI/Input/Index";
 import { LoginType } from "../../@Types/LoginType";
-import LoginServices from '../../services/Auth/LoginServices'
+import LoginServices from '../../services/Auth/LoginServices';
 import { MessageModal } from "../../UI/MessageModal/MessageModal";
 import { MessageModalPropsType } from "../../@Types/MessageModalPropsType";
+import { AuthContext } from '../../Context/AuthContext';
 
-const Login = ({ navigation, route }: any) => {
-    const { isLoggedIn } = route.params;
+const Login = ({ navigation}: any) => {
+    const {auth, setAuth} = useContext(AuthContext);
     const [modal, setModal] = useState<MessageModalPropsType>(
         {
             message: "",
@@ -23,17 +24,17 @@ const Login = ({ navigation, route }: any) => {
         LoggedIn: false
     });
 
-    const showModal = (message: string, closeModalModify?: () => void): void => {
+    const showModal = (message: string, otherCloseModal?: () => void): void => {
         setModal({
             message: message,
             showModal: true,
-            closeModal: closeModalModify || hideModal
+            closeModal: otherCloseModal || hideModal
         });
     }
 
     function closeModalModify(): void {
-        setModal((prev) => { return { ...prev, showModal: false } })
-        onClickRegister()
+        hideModal();
+        setAuth(login)
     }
 
     function hideModal(): void {
@@ -53,18 +54,25 @@ const Login = ({ navigation, route }: any) => {
     }
 
     const checkFields = () => {
-        if (!login.Email || !login.Pass) {
+        if(!login.Email){
+            showModal("Preencha o Email.")
+            return false; 
+        }
+
+        if(!login.Pass){
+            showModal("Preencha a Senha.")
             return false;
-        } else return true;
+        }
+       
+        return true;
     }
 
     const onClickLogin = () => {
         if (checkFields()) {
-
             LoginServices.LoginAxiosRequest(login)
                 .then((response) => {
-                    // alert(response.message)
-
+                    
+                    setLogin((prev)=> {return {...prev, LoggedIn: true}})
                     showModal(response.message, closeModalModify);
                 })
                 .catch((error) => {
@@ -75,8 +83,6 @@ const Login = ({ navigation, route }: any) => {
                 });
         }
     }
-
-
 
     const onClickRegister = () => {
         navigation.navigate('Register');

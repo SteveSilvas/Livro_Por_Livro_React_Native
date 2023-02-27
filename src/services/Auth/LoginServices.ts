@@ -1,7 +1,7 @@
 import axios from "axios";
 import { LoginType } from "../../@Types/LoginType";
 
-const usersURL = "http://10.9.0.115:4200/users";
+const usersURL = "http://192.168.1.102:4200/users";
 
 const LoginRequest = (data: LoginType) => {
     const usersURL = "http://192.168.1.103:4200/users";
@@ -32,7 +32,6 @@ const LoginAxiosRequest = (data: LoginType) => {
             return response.data;
         })
         .catch((error) => {
-            console.log(error)
             throw error;
         });
 };

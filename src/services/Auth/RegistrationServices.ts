@@ -1,7 +1,7 @@
 import axios from "axios";
 import { UserRegisterType } from "../../@Types/UserRegisterType";
 
-const usersURL = "http://10.9.0.115:4200/users";
+const usersURL = "http://192.168.1.102:4200/users";
 
 const RegisterRequest = (data: UserRegisterType) => {
     return fetch(`${usersURL}/add`, {

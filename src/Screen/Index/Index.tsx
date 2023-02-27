@@ -1,26 +1,26 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useContext } from 'react';
 import { View, Text } from 'react-native';
-import { NavigationContainer } from '@react-navigation/native';
-import { AuthRoutes } from '../../Routes/auth.routes';
-import { PrivateRoutes } from '../../Routes/private.routes';
+import { PublicRoutes } from '../../Routes/public.routes';
+import { AppRoutes } from '../../Routes/app.routes';
 import { SafeAreaView } from 'react-native';
+import { AuthContext } from '../../Context/AuthContext';
 
 export default function Index() {
-    const [isLoggedIn, setIsLoggedIn] = useState<boolean>(false);
+    const auth = useContext(AuthContext);
 
-    const renderPrivateRoutes = () => {
-        return isLoggedIn && <PrivateRoutes />;
+    const renderPublicRoutes = () => {
+        return !auth.auth.LoggedIn && <PublicRoutes />;
     }
-    const handleLogin = (isLoggedIn: boolean) => {
-        setIsLoggedIn(isLoggedIn);
+
+
+    const renderAppRoutes = () => {
+        return auth.auth.LoggedIn && <AppRoutes />;
     }
 
     return (
         <SafeAreaView style={{ flex: 1 }}>
-            <NavigationContainer>
-                <AuthRoutes setIsLoggedIn={handleLogin} />
-                {renderPrivateRoutes()}
-            </NavigationContainer>
+            {renderPublicRoutes()}
+            {renderAppRoutes()}
         </SafeAreaView>
     );
 }
