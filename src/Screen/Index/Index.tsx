@@ -12,7 +12,6 @@ export default function Index() {
         return !auth.auth.LoggedIn && <PublicRoutes />;
     }
 
-
     const renderAppRoutes = () => {
         return auth.auth.LoggedIn && <AppRoutes />;
     }

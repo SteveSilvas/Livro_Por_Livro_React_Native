@@ -6,6 +6,7 @@ import { MessageModalPropsType } from '../../@Types/MessageModalPropsType';
 
 export function MessageModal(modalProps: MessageModalPropsType) {
     const [showModalLocal, setShowModalLocal] = useState<boolean>(modalProps.showModal);
+    const justifyFooter = modalProps.children ? "space-between" : "center";
 
     useEffect(() => {
         if (modalProps.showModal) {
@@ -23,6 +24,15 @@ export function MessageModal(modalProps: MessageModalPropsType) {
         modalProps.closeModal()
     }
 
+    const renderChildren = () => {
+        return modalProps.children && (
+            <View style={styles.footerElement}>
+                {modalProps.children}
+
+            </View>
+        )
+    }
+
     return (
         <Modal
             animationType='fade'
@@ -32,10 +42,13 @@ export function MessageModal(modalProps: MessageModalPropsType) {
             <View style={styles.modalContainer}>
                 <View style={styles.modalPanel}>
                     <Text style={styles.modalTitle}>{modalProps.message}</Text>
-                    <View style={styles.modalFooter}>
-                        <Button
-                            onClick={hideModal}
-                            text="OK" />
+                    <View style={[styles.modalFooter, { justifyContent: justifyFooter }]}>
+                        <View style={styles.footerElement}>
+                            <Button
+                                onClick={hideModal}
+                                text="Fechar" />
+                        </View>
+                        {renderChildren()}
                     </View>
                 </View>
 
@@ -43,6 +56,7 @@ export function MessageModal(modalProps: MessageModalPropsType) {
         </Modal>
     );
 };
+
 
 const styles = StyleSheet.create({
     modalContainer: {
@@ -53,25 +67,30 @@ const styles = StyleSheet.create({
     },
     modalPanel: {
         width: "80%",
-        display:"flex",
-        alignItems:"center",
+        display: "flex",
+        alignItems: "center",
         backgroundColor: '#fff',
         padding: 20,
         borderRadius: 5,
         borderWidth: 1,
         borderColor: 'gray',
-        shadowOffset: {width: -2, height: 4},  
+        shadowOffset: { width: -2, height: 4 },
         shadowColor: "black",
-        elevation:20,
+        elevation: 20,
     },
 
     modalTitle: {
         fontSize: 20
     },
-    
+
     modalFooter: {
         width: "100%",
-        display:"flex",
-        alignItems:"center",
+        display: "flex",
+        alignItems: "center",
+        flexDirection: "row"
+    },
+
+    footerElement: {
+        flex: 1
     }
 });

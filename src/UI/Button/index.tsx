@@ -16,7 +16,7 @@ const style = StyleSheet.create({
         color: "black",
         fontSize: 15,
         textAlign: "center",
-        width: "60%",
+        width: "100%",
         borderRadius: 12,
         padding:6
     }
