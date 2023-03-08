@@ -4,43 +4,10 @@ import Button from '../../../UI/Button';
 import { AuthContext } from '../../../Context/AuthContext';
 import { ConfirmModal } from '../../../UI/ConfirmModal';
 const Home = ({ navigation }: any) => {
-    const { auth, setAuth } = useContext(AuthContext);
-    const [showConfirm, setShowConfir] = useState<boolean>(false);
-    const loggout = () => {
-        setShowConfir(false)
-        setAuth({
-            Email: "",
-            Pass: "",
-            LoggedIn: false
-        });
-    }
-
-    const handleCloseModal = () => {
-        setShowConfir(false)
-    }
-
-    const handleConfirmModal = () => {
-        loggout();
-    }
-
-    const renderConfirmModal = () => {
-        return showConfirm
-            && <ConfirmModal
-                message="Deseja realmente sair?"
-                showModal={showConfirm}
-                closeModal={handleCloseModal}
-                confirmModal={handleConfirmModal}/>
-    }
-
-    return (
+    return(
         <SafeAreaView>
-            {renderConfirmModal()}
-            <ScrollView>
-                <Text>Home</Text>
-                <Button text="Loggout" onClick={()=>{setShowConfir(true)}}
-                />
-            </ScrollView>
-        </SafeAreaView >
+            <Text>Home</Text>
+        </SafeAreaView>
     );
 }
 

@@ -1,15 +1,10 @@
 import React, { useState, useEffect } from 'react';
-import { StatusBar } from 'expo-status-bar';
 import { SafeAreaView, ScrollView, StyleSheet, Text, View } from 'react-native';
 import { Input } from '../../UI/Input/Index';
 import Button from '../../UI/Button';
-import api from '../../services/Api';
-import axios from "axios";
-import StatusRoute from '../../@Tests/StatusRequets';
 import Registration from '../../services/Auth/RegistrationServices';
 import { UserRegisterType } from '../../@Types/UserRegisterType';
-import { MessageModal } from '../../UI/MessageModal/MessageModal';
-import StatusRequets from '../../@Tests/StatusRequets';
+import { MessageModal } from '../../UI/MessageModal/index,';
 
 export default function Register({ navigation }: any) {
     const date = new Date(1995, 1, 1);
@@ -30,7 +25,6 @@ export default function Register({ navigation }: any) {
             setError("");
         }
     }, [showMessageModal]);
-
 
     const changeNameHandler = (name: string) => {
         setUser((prev) => {
@@ -92,7 +86,9 @@ export default function Register({ navigation }: any) {
     }
 
     const onClickSave = () => {
+        setShowMessageModal(true)
         if (checkFields()) {
+            setShowMessageModal(true)
             Registration.RegisterAxiosRequest(user)
             .then((response)=>{
                 setError(response);

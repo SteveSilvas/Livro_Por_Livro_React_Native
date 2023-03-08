@@ -1,6 +1,6 @@
 import React from 'react';
 import { Modal, View, Text } from 'react-native';
-import { MessageModal } from '../MessageModal/MessageModal';
+import { MessageModal } from '../MessageModal/index,';
 import Button from '../Button';
 
 type ConfirModalPropsType = {

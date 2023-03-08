@@ -4,7 +4,7 @@ import Button from "../../UI/Button";
 import { Input } from "../../UI/Input/Index";
 import { LoginType } from "../../@Types/LoginType";
 import LoginServices from '../../services/Auth/LoginServices';
-import { MessageModal } from "../../UI/MessageModal/MessageModal";
+import { MessageModal } from "../../UI/MessageModal/index,";
 import { MessageModalPropsType } from "../../@Types/MessageModalPropsType";
 import { AuthContext } from '../../Context/AuthContext';
 
@@ -33,8 +33,8 @@ const Login = ({ navigation}: any) => {
     }
 
     function closeModalModify(): void {
+        setAuth(login);
         hideModal();
-        setAuth(login)
     }
 
     function hideModal(): void {
@@ -55,12 +55,12 @@ const Login = ({ navigation}: any) => {
 
     const checkFields = () => {
         if(!login.Email){
-            showModal("Preencha o Email.")
+            showModal("Preencha o Email.");
             return false; 
         }
 
         if(!login.Pass){
-            showModal("Preencha a Senha.")
+            showModal("Preencha a Senha.");
             return false;
         }
        
@@ -68,6 +68,7 @@ const Login = ({ navigation}: any) => {
     }
 
     const onClickLogin = () => {
+        
         if (checkFields()) {
             LoginServices.LoginAxiosRequest(login)
                 .then((response) => {
