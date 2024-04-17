@@ -12,59 +12,59 @@ export function AppRoutes() {
     return (
         <NavigationContainer>
             <Tab.Navigator
-           >
-                 <Tab.Screen
-          name="Home"
-          component={HomeScreen}
-          options={{
-            tabBarIcon: ({ focused, color, size }) => (
-              <Ionicons
-                name={focused ? 'home' : 'home-outline'}
-                size={size}
-                color={color}
-              />
-            ),
-          }}
-        />
-        <Tab.Screen
-          name="Search"
-          component={SearchScreen}
-          options={{
-            tabBarIcon: ({ focused, color, size }) => (
-              <Ionicons
-                name={focused ? 'search' : 'search-outline'}
-                size={size}
-                color={color}
-              />
-            ),
-          }}
-        />
-        <Tab.Screen
-          name="Profile"
-          component={ProfileScreen}
-          options={{
-            tabBarIcon: ({ focused, color, size }) => (
-              <Ionicons
-                name={focused ? 'person' : 'person-outline'}
-                size={size}
-                color={color}
-              />
-            ),
-          }}
-        />
-        <Tab.Screen
-          name="Settings"
-          component={SettingsScreen}
-          options={{
-            tabBarIcon: ({ focused, color, size }) => (
-              <Ionicons
-                name={focused ? 'settings' : 'settings-outline'}
-                size={size}
-                color={color}
-              />
-            ),
-          }}
-        />
+            >
+                <Tab.Screen
+                    name="Home"
+                    component={HomeScreen}
+                    options={{
+                        tabBarIcon: ({ focused, color, size }) => (
+                            <Ionicons
+                                name={focused ? 'home' : 'home-outline'}
+                                size={size}
+                                color={color}
+                            />
+                        ),
+                    }}
+                />
+                <Tab.Screen
+                    name="Search"
+                    component={SearchScreen}
+                    options={{
+                        tabBarIcon: ({ focused, color, size }) => (
+                            <Ionicons
+                                name={focused ? 'search' : 'search-outline'}
+                                size={size}
+                                color={color}
+                            />
+                        ),
+                    }}
+                />
+                <Tab.Screen
+                    name="Profile"
+                    component={ProfileScreen}
+                    options={{
+                        tabBarIcon: ({ focused, color, size }) => (
+                            <Ionicons
+                                name={focused ? 'person' : 'person-outline'}
+                                size={size}
+                                color={color}
+                            />
+                        ),
+                    }}
+                />
+                <Tab.Screen
+                    name="Settings"
+                    component={SettingsScreen}
+                    options={{
+                        tabBarIcon: ({ focused, color, size }) => (
+                            <Ionicons
+                                name={focused ? 'settings' : 'settings-outline'}
+                                size={size}
+                                color={color}
+                            />
+                        ),
+                    }}
+                />
             </Tab.Navigator>
         </NavigationContainer>
     );
