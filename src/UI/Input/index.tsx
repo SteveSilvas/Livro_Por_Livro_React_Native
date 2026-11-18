@@ -10,7 +10,13 @@ export function Input(props: InputType) {
             onChangeText={props.onChange}
             value={props.value}
             placeholder={props.placeholder}
-            keyboardType={props.type} />
+            keyboardType={props.type}
+            secureTextEntry={props.secureTextEntry}
+            autoCapitalize={props.autoCapitalize}
+            autoCorrect={props.autoCorrect}
+            editable={props.editable}
+            maxLength={props.maxLength}
+            onEndEditing={props.onEndEditing} />
     );
 }
 

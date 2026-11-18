@@ -4,7 +4,15 @@ import { Input } from '../../UI/Input/index';
 import Button from '../../UI/Button';
 import { MessageModal } from '../../UI/MessageModal/index';
 import { useAuth } from '../../Context/AuthContext';
-import { ApiError } from '../../services/api/client';
+import { getErrorMessage } from '../../Util/errors';
+import {
+    isValidBirthDate,
+    isValidEmail,
+    isValidName,
+    isValidPassword,
+    MIN_PASSWORD_LENGTH,
+    toIsoDate,
+} from '../../Util/validation';
 import * as usersApi from '../../services/api/users';
 
 interface RegisterForm {
@@ -25,6 +33,8 @@ export default function Register({ navigation }: any) {
     const [confirmPass, setConfirmPass] = useState<string>("")
     const [error, setError] = useState<string>("")
     const [showMessageModal, setShowMessageModal] = useState<boolean>(false);
+    const [saving, setSaving] = useState<boolean>(false);
+    const [success, setSuccess] = useState<boolean>(false);
 
     useEffect(() => {
         if (!showMessageModal) {
@@ -72,7 +82,39 @@ export default function Register({ navigation }: any) {
         } else return true;
     }
 
+    const checkName = () => {
+        if (!isValidName(user.Name)) {
+            setError("Informe o nome.");
+            setShowMessageModal(true);
+            return false;
+        }
+        return true;
+    }
+
+    const checkEmail = () => {
+        if (!isValidEmail(user.Email)) {
+            setError("Informe um e-mail válido.");
+            setShowMessageModal(true);
+            return false;
+        }
+        return true;
+    }
+
+    const checkBirth = () => {
+        if (!isValidBirthDate(user.Birth)) {
+            setError("Informe uma data de nascimento válida (AAAA-MM-DD).");
+            setShowMessageModal(true);
+            return false;
+        }
+        return true;
+    }
+
     const checkPass = () => {
+        if (!isValidPassword(user.Pass)) {
+            setError(`A senha deve ter ao menos ${MIN_PASSWORD_LENGTH} caracteres.`);
+            setShowMessageModal(true);
+            return false;
+        }
         if (user.Pass != confirmPass) {
             setError("Senhas diferentes");
             setShowMessageModal(true)
@@ -82,43 +124,54 @@ export default function Register({ navigation }: any) {
     }
 
     const checkFields = () => {
-        return checkMandatorys() && checkPass();
+        return (
+            checkMandatorys() &&
+            checkName() &&
+            checkEmail() &&
+            checkBirth() &&
+            checkPass()
+        );
     }
 
     const onClickSave = async () => {
-        if (!checkFields()) {
+        if (saving || !checkFields()) {
             return;
         }
+        setSaving(true);
         try {
             await usersApi.createUser({
-                Name: user.Name,
-                // O backend aceita string ISO ou Date; normalizamos para ISO.
-                Birth: new Date(user.Birth).toISOString(),
-                Email: user.Email,
+                Name: user.Name.trim(),
+                Birth: toIsoDate(user.Birth),
+                Email: user.Email.trim(),
                 Pass: user.Pass,
             });
+            setSuccess(true);
             setError("Cadastro realizado com sucesso!");
             setShowMessageModal(true)
             setTimeout(async () => {
                 // Autentica automaticamente após o cadastro.
                 try {
-                    await login({ Email: user.Email, Pass: user.Pass });
+                    await login({ Email: user.Email.trim(), Pass: user.Pass });
                 } catch {
+                    setSuccess(false);
                     navigation.navigate('Login');
                 }
             }, 1500)
         } catch (error) {
-            const message =
-                error instanceof ApiError
-                    ? error.message
-                    : 'Não foi possível cadastrar. Tente novamente.';
-            setError(message);
+            setError(getErrorMessage(error, 'Não foi possível cadastrar. Tente novamente.'));
             setShowMessageModal(true)
+        } finally {
+            setSaving(false);
         }
     }
 
     const closeMessageModalHandler = () => {
         setShowMessageModal(false);
+        // Após o sucesso, fecha a modal e volta ao login caso o auto-login falhe.
+        if (success) {
+            setSuccess(false);
+            navigation.navigate('Login');
+        }
     }
 
     const renderMessageModal = () => {
@@ -132,13 +185,14 @@ export default function Register({ navigation }: any) {
     return (
         <SafeAreaView style={styles.container}>
             {renderMessageModal()}
-            <ScrollView style={styles.scrollView}>
+            <ScrollView style={styles.scrollView} keyboardShouldPersistTaps="handled">
                 <View style={styles.form}>
                     <View style={styles.rowForm}>
                         <Text style={styles.label}>Nome:</Text>
                         <Input
                             style={styles.input}
                             type='default'
+                            editable={!saving}
                             value={user.Name}
                             onChange={changeNameHandler}
                         />
@@ -150,6 +204,7 @@ export default function Register({ navigation }: any) {
                             style={styles.input}
                             type='default'
                             placeholder="1995-01-31"
+                            editable={!saving}
                             value={user.Birth}
                             onChange={changeBirthHandler}
                         />
@@ -160,6 +215,9 @@ export default function Register({ navigation }: any) {
                         <Input
                             style={styles.input}
                             type='email-address'
+                            autoCapitalize="none"
+                            autoCorrect={false}
+                            editable={!saving}
                             value={user.Email}
                             onChange={changeEmailHandler}
                         />
@@ -170,6 +228,9 @@ export default function Register({ navigation }: any) {
                         <Input
                             style={styles.input}
                             type='default'
+                            secureTextEntry
+                            autoCapitalize="none"
+                            editable={!saving}
                             value={user.Pass}
                             onChange={changePassHandler}
                         />
@@ -180,6 +241,9 @@ export default function Register({ navigation }: any) {
                         <Input
                             style={styles.input}
                             type='default'
+                            secureTextEntry
+                            autoCapitalize="none"
+                            editable={!saving}
                             value={confirmPass}
                             onChange={changeConfirmPassHandler}
                         />
@@ -193,7 +257,7 @@ export default function Register({ navigation }: any) {
                             onClick={onClickLogin}
                         />
                         <Button
-                            text="Salvar"
+                            text={saving ? "Salvando..." : "Salvar"}
                             style={styles.button}
                             onClick={onClickSave}
                         />

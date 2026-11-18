@@ -6,7 +6,8 @@ import { LoginType } from "../../@Types/api";
 import { MessageModal } from "../../UI/MessageModal/index";
 import { MessageModalPropsType } from "../../@Types/MessageModalPropsType";
 import { useAuth } from '../../Context/AuthContext';
-import { ApiError } from '../../services/api/client';
+import { getErrorMessage } from '../../Util/errors';
+import { isValidEmail } from '../../Util/validation';
 
 const Login = ({ navigation }: any) => {
     const { login, loading } = useAuth();
@@ -53,6 +54,11 @@ const Login = ({ navigation }: any) => {
             return false;
         }
 
+        if (!isValidEmail(loginData.Email)) {
+            showModal("Informe um e-mail válido.");
+            return false;
+        }
+
         if (!loginData.Pass) {
             showModal("Preencha a Senha.");
             return false;
@@ -62,19 +68,18 @@ const Login = ({ navigation }: any) => {
     }
 
     const onClickLogin = async () => {
-        if (!checkFields()) {
+        if (loading || !checkFields()) {
             return;
         }
         try {
-            await login(loginData);
+            await login({
+                Email: loginData.Email.trim(),
+                Pass: loginData.Pass,
+            });
             // Em caso de sucesso o AuthContext passa a `isLoggedIn = true`
             // e o Index troca automaticamente para as rotas autenticadas.
         } catch (error) {
-            const message =
-                error instanceof ApiError
-                    ? error.message
-                    : 'Não foi possível entrar. Tente novamente.';
-            showModal(message);
+            showModal(getErrorMessage(error, 'Não foi possível entrar. Tente novamente.'));
         }
     }
 
@@ -93,7 +98,7 @@ const Login = ({ navigation }: any) => {
     return (
         <SafeAreaView style={styles.loginPage}>
             {renderMessageModal()}
-            <ScrollView>
+            <ScrollView keyboardShouldPersistTaps="handled">
                 <View style={styles.panelApresentation}>
                     <Image
                         style={{ width: 150, height: 150, resizeMode: "contain" }}
@@ -107,6 +112,9 @@ const Login = ({ navigation }: any) => {
                         <Text>Email:</Text>
                         <Input
                             type="email-address"
+                            autoCapitalize="none"
+                            autoCorrect={false}
+                            editable={!loading}
                             value={loginData.Email}
                             onChange={changeEmailHandler}
                         />
@@ -116,8 +124,12 @@ const Login = ({ navigation }: any) => {
                         <Text>Senha:</Text>
                         <Input
                             type="default"
+                            secureTextEntry
+                            autoCapitalize="none"
+                            editable={!loading}
                             value={loginData.Pass}
                             onChange={changePassHandler}
+                            onEndEditing={onClickLogin}
                         />
                         <Text style={styles.linkPass}>Esqueci a senha</Text>
                     </View>
