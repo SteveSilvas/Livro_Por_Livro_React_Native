@@ -1,24 +1,30 @@
-import React, { useState, useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { SafeAreaView, ScrollView, StyleSheet, Text, View } from 'react-native';
-import { Input } from '../../UI/Input/Index';
+import { Input } from '../../UI/Input/index';
 import Button from '../../UI/Button';
-import Registration from '../../services/Auth/RegistrationServices';
-import { UserRegisterType } from '../../@Types/UserRegisterType';
-import { MessageModal } from '../../UI/MessageModal/index,';
+import { MessageModal } from '../../UI/MessageModal/index';
+import { useAuth } from '../../Context/AuthContext';
+import { ApiError } from '../../services/api/client';
+import * as usersApi from '../../services/api/users';
+
+interface RegisterForm {
+    Name: string;
+    Birth: string;
+    Email: string;
+    Pass: string;
+}
 
 export default function Register({ navigation }: any) {
-    const date = new Date(1995, 1, 1);
-    const [user, setUser] = useState<UserRegisterType>({
-        Id: 0,
+    const { login } = useAuth();
+    const [user, setUser] = useState<RegisterForm>({
         Name: "",
-        Birth: date,
+        Birth: "",
         Email: "",
         Pass: ""
     });
     const [confirmPass, setConfirmPass] = useState<string>("")
     const [error, setError] = useState<string>("")
     const [showMessageModal, setShowMessageModal] = useState<boolean>(false);
-
 
     useEffect(() => {
         if (!showMessageModal) {
@@ -32,7 +38,7 @@ export default function Register({ navigation }: any) {
         });
     }
 
-    const changeBirthHandler = (birth: any) => {
+    const changeBirthHandler = (birth: string) => {
         setUser((prev) => {
             return { ...prev, Birth: birth }
         });
@@ -59,12 +65,9 @@ export default function Register({ navigation }: any) {
     }
 
     const checkMandatorys = () => {
-
         if (!user.Name || !user.Birth || !user.Email || !user.Pass || !confirmPass) {
-
             setShowMessageModal(true)
             setError("Preencha todos os campos");
-
             return false;
         } else return true;
     }
@@ -73,34 +76,44 @@ export default function Register({ navigation }: any) {
         if (user.Pass != confirmPass) {
             setError("Senhas diferentes");
             setShowMessageModal(true)
-
             return false
         }
         return true;
     }
 
     const checkFields = () => {
-        let errorStatus: boolean = checkMandatorys() && checkPass();
-
-        return errorStatus;
+        return checkMandatorys() && checkPass();
     }
 
-    const onClickSave = () => {
-        setShowMessageModal(true)
-        if (checkFields()) {
-            setShowMessageModal(true)
-            Registration.RegisterAxiosRequest(user)
-            .then((response)=>{
-                setError(response);
-                setShowMessageModal(true)
-                setTimeout(()=>{
-                    navigation.navigate('Login');
-                }, 3000)
-            })
-            .catch((error)=>{
-                setError(error.response.data);
-                setShowMessageModal(true)
+    const onClickSave = async () => {
+        if (!checkFields()) {
+            return;
+        }
+        try {
+            await usersApi.createUser({
+                Name: user.Name,
+                // O backend aceita string ISO ou Date; normalizamos para ISO.
+                Birth: new Date(user.Birth).toISOString(),
+                Email: user.Email,
+                Pass: user.Pass,
             });
+            setError("Cadastro realizado com sucesso!");
+            setShowMessageModal(true)
+            setTimeout(async () => {
+                // Autentica automaticamente após o cadastro.
+                try {
+                    await login({ Email: user.Email, Pass: user.Pass });
+                } catch {
+                    navigation.navigate('Login');
+                }
+            }, 1500)
+        } catch (error) {
+            const message =
+                error instanceof ApiError
+                    ? error.message
+                    : 'Não foi possível cadastrar. Tente novamente.';
+            setError(message);
+            setShowMessageModal(true)
         }
     }
 
@@ -126,15 +139,18 @@ export default function Register({ navigation }: any) {
                         <Input
                             style={styles.input}
                             type='default'
+                            value={user.Name}
                             onChange={changeNameHandler}
                         />
                     </View>
 
                     <View style={styles.rowForm}>
-                        <Text style={styles.label}>Nascimento:</Text>
+                        <Text style={styles.label}>Nascimento (AAAA-MM-DD):</Text>
                         <Input
                             style={styles.input}
-                            type='numeric'
+                            type='default'
+                            placeholder="1995-01-31"
+                            value={user.Birth}
                             onChange={changeBirthHandler}
                         />
                     </View>
@@ -144,6 +160,7 @@ export default function Register({ navigation }: any) {
                         <Input
                             style={styles.input}
                             type='email-address'
+                            value={user.Email}
                             onChange={changeEmailHandler}
                         />
                     </View>
@@ -153,6 +170,7 @@ export default function Register({ navigation }: any) {
                         <Input
                             style={styles.input}
                             type='default'
+                            value={user.Pass}
                             onChange={changePassHandler}
                         />
                     </View>
@@ -162,6 +180,7 @@ export default function Register({ navigation }: any) {
                         <Input
                             style={styles.input}
                             type='default'
+                            value={confirmPass}
                             onChange={changeConfirmPassHandler}
                         />
                     </View>

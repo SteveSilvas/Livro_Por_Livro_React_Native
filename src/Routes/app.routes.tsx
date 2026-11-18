@@ -2,6 +2,7 @@ import HomeScreen from '../Screen/App/Home';
 import ProfileScreen from '../Screen/App/Profile';
 import SearchScreen from '../Screen/App/Search';
 import SettingsScreen from '../Screen/App/Settings'
+import LogoutScreen from '../Screen/App/Logout';
 import React from 'react';
 import { NavigationContainer } from '@react-navigation/native';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
@@ -59,6 +60,19 @@ export function AppRoutes() {
                         tabBarIcon: ({ focused, color, size }) => (
                             <Ionicons
                                 name={focused ? 'settings' : 'settings-outline'}
+                                size={size}
+                                color={color}
+                            />
+                        ),
+                    }}
+                />
+                <Tab.Screen
+                    name="Logout"
+                    component={LogoutScreen}
+                    options={{
+                        tabBarIcon: ({ focused, color, size }) => (
+                            <Ionicons
+                                name={focused ? 'log-out' : 'log-out-outline'}
                                 size={size}
                                 color={color}
                             />

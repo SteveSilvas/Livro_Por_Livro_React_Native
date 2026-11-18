@@ -1,7 +1,7 @@
-import { KeyboardType } from "react-native"
+import { KeyboardTypeOptions } from "react-native"
 
 export type InputType = {
-    type: KeyboardType,
+    type: KeyboardTypeOptions,
     style?: object,
     placeholder?: string,
     onChange: (e: any) => void,

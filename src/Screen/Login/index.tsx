@@ -1,15 +1,15 @@
-import React, { useState, useContext } from "react";
-import { StyleSheet, View, Text, Image, TextInput, ScrollView, SafeAreaView } from "react-native";
+import React, { useState } from "react";
+import { StyleSheet, View, Text, Image, ScrollView, SafeAreaView } from "react-native";
 import Button from "../../UI/Button";
-import { Input } from "../../UI/Input/Index";
-import { LoginType } from "../../@Types/LoginType";
-import LoginServices from '../../services/Auth/LoginServices';
-import { MessageModal } from "../../UI/MessageModal/index,";
+import { Input } from "../../UI/Input/index";
+import { LoginType } from "../../@Types/api";
+import { MessageModal } from "../../UI/MessageModal/index";
 import { MessageModalPropsType } from "../../@Types/MessageModalPropsType";
-import { AuthContext } from '../../Context/AuthContext';
+import { useAuth } from '../../Context/AuthContext';
+import { ApiError } from '../../services/api/client';
 
-const Login = ({ navigation}: any) => {
-    const {auth, setAuth} = useContext(AuthContext);
+const Login = ({ navigation }: any) => {
+    const { login, loading } = useAuth();
     const [modal, setModal] = useState<MessageModalPropsType>(
         {
             message: "",
@@ -18,10 +18,9 @@ const Login = ({ navigation}: any) => {
         }
     );
 
-    const [login, setLogin] = useState<LoginType>({
+    const [loginData, setLoginData] = useState<LoginType>({
         Email: "",
         Pass: "",
-        LoggedIn: false
     });
 
     const showModal = (message: string, otherCloseModal?: () => void): void => {
@@ -32,56 +31,50 @@ const Login = ({ navigation}: any) => {
         });
     }
 
-    function closeModalModify(): void {
-        setAuth(login);
-        hideModal();
-    }
-
     function hideModal(): void {
         setModal((prev) => { return { ...prev, showModal: false } })
     }
 
     const changeEmailHandler = (email: string) => {
-        setLogin((prev) => {
+        setLoginData((prev) => {
             return { ...prev, Email: email }
         });
     }
 
     const changePassHandler = (pass: string) => {
-        setLogin((prev) => {
+        setLoginData((prev) => {
             return { ...prev, Pass: pass }
         });
     }
 
     const checkFields = () => {
-        if(!login.Email){
+        if (!loginData.Email) {
             showModal("Preencha o Email.");
-            return false; 
+            return false;
         }
 
-        if(!login.Pass){
+        if (!loginData.Pass) {
             showModal("Preencha a Senha.");
             return false;
         }
-       
+
         return true;
     }
 
-    const onClickLogin = () => {
-        
-        if (checkFields()) {
-            LoginServices.LoginAxiosRequest(login)
-                .then((response) => {
-                    
-                    setLogin((prev)=> {return {...prev, LoggedIn: true}})
-                    showModal(response.message, closeModalModify);
-                })
-                .catch((error) => {
-                    if (error.response) {
-                        const errorMessage: string = `Erro: ${error.response.data}`;
-                        showModal(errorMessage);
-                    }
-                });
+    const onClickLogin = async () => {
+        if (!checkFields()) {
+            return;
+        }
+        try {
+            await login(loginData);
+            // Em caso de sucesso o AuthContext passa a `isLoggedIn = true`
+            // e o Index troca automaticamente para as rotas autenticadas.
+        } catch (error) {
+            const message =
+                error instanceof ApiError
+                    ? error.message
+                    : 'Não foi possível entrar. Tente novamente.';
+            showModal(message);
         }
     }
 
@@ -114,6 +107,7 @@ const Login = ({ navigation}: any) => {
                         <Text>Email:</Text>
                         <Input
                             type="email-address"
+                            value={loginData.Email}
                             onChange={changeEmailHandler}
                         />
                     </View>
@@ -122,13 +116,14 @@ const Login = ({ navigation}: any) => {
                         <Text>Senha:</Text>
                         <Input
                             type="default"
+                            value={loginData.Pass}
                             onChange={changePassHandler}
                         />
                         <Text style={styles.linkPass}>Esqueci a senha</Text>
                     </View>
 
                     <Button
-                        text="Entrar"
+                        text={loading ? "Entrando..." : "Entrar"}
                         style={styles.button}
                         onClick={onClickLogin}
                     />
