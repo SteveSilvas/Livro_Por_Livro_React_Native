@@ -1,32 +1,36 @@
-const { getDefaultConfig } = require('metro-config');
+const { getDefaultConfig } = require('expo/metro-config');
 
-module.exports = (async () => {
-  const {
-    resolver: { sourceExts },
-  } = await getDefaultConfig();
-  return {
-    transformer: {
-      babelTransformerPath: require.resolve('react-native-svg-transformer'),
-      assetPlugins: ['expo-asset/tools/hashAssetFiles'],
-    },
-    resolver: {
-      sourceExts: [...sourceExts, 'env'], // Adiciona a extensão .env ao resolver de arquivos
-      extraNodeModules: new Proxy(
-        {},
-        {
-          get: (target, name) => {
-            if (name === 'dotenv') {
-              // Ignora a importação do módulo dotenv em ambientes de produção
-              return {
-                config: () => {
-                  return;
-                },
-              };
-            }
-            return name;
-          },
-        }
-      ),
-    },
+module.exports = (() => {
+  const config = getDefaultConfig(__dirname);
+
+  const { transformer, resolver } = config;
+
+  config.transformer = {
+    ...transformer,
+    babelTransformerPath: require.resolve('react-native-svg-transformer/expo'),
   };
+
+  config.resolver = {
+    ...resolver,
+    assetExts: resolver.assetExts.filter((ext) => ext !== 'svg'),
+    sourceExts: [...resolver.sourceExts, 'svg', 'env'], // Adiciona .svg e .env ao resolver
+    extraNodeModules: new Proxy(
+      {},
+      {
+        get: (target, name) => {
+          if (name === 'dotenv') {
+            // Ignora a importação do módulo dotenv em ambientes de produção
+            return {
+              config: () => {
+                return;
+              },
+            };
+          }
+          return name;
+        },
+      }
+    ),
+  };
+
+  return config;
 })();
