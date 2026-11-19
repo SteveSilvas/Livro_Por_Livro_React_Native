@@ -5,6 +5,8 @@ Aplicativo mobile (Android / iOS / Web) do projeto **Books Barter / EscamboLiter
 estante digital e recursos sociais.
 
 > Proposta do produto e regras de negócio: veja o [README do repositório principal](../README.md).
+>
+> 📌 **Planejamento:** o andamento (feito × pendente) do app está em [`ROADMAP.md`](./ROADMAP.md).
 
 ---
 
@@ -21,7 +23,7 @@ estante digital e recursos sociais.
 
 ## ✅ Pré-requisitos
 
-* **Node.js** (recomendado 20+) e **npm**
+* **Node.js 26** (versão fixada em `.nvmrc` e em `engines.node`) e **npm**
 * Para rodar no celular: o app **Expo Go** (Android/iOS) **ou** um emulador Android / simulador iOS
 * A **API** acessível (ver seção [Integração com a API](#-integração-com-a-api))
 
